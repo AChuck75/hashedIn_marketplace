@@ -1,0 +1,18 @@
+<div class="dashboard-container">
+  <h2>Featured Products</h2>
+  <div class="product-grid">
+    <div class="product-card" *ngFor="let product of products">
+      <img [src]="product.image" [alt]="product.name" />
+      <h3>{{ product.name }}</h3>
+      <p class="price">${{ product.price }}</p>
+      <button *ngIf="product.count===0" (click)="onAddToCart(product)">{{`Add to Cart`}}</button>
+      <div class="cart-controls" *ngIf="product.count > 0">
+        <button *ngIf="product.count > 0" (click)="onAddToCart(product)">+</button>
+        <div *ngIf="product.count > 0" class="item-count">
+        {{ product.count }}
+        </div>
+        <button *ngIf="product.count > 0" (click)="onRemoveFromCart(product)">-</button>
+      </div>
+    </div>
+  </div>
+</div>

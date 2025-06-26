@@ -1,0 +1,14 @@
+<div class="cart-container">
+  <h2>Your Cart</h2>
+  <div *ngIf="cartItems.length === 0">Your cart is empty.</div>
+  <div *ngFor="let item of cartItems" class="cart-item">
+    <img [src]="item.image" width="60" />
+    <span>{{ item.name }}</span>
+    <span>Qty: {{ item.count }}</span>
+    <span>${{ item.price * item.count }}</span>
+  </div>
+  <div *ngIf="cartItems.length > 0" class="cart-total">
+    <strong>Total: ${{ totalPrice }}</strong>
+  </div>
+    <button class="checkout-button" (click)="checkout()">Checkout</button>
+</div>

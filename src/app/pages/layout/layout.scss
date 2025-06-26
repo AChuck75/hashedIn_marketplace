@@ -1,0 +1,60 @@
+
+main {
+  padding: 0 2rem;
+}
+.input-search{
+  padding: 0.2rem;
+}
+.company-header {
+   color: black;
+   text-align: center;
+  display: flex;
+  padding-left: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  border: 1px solid #e0e0e0;
+}
+
+.profile-menu {
+    padding-right: 1rem;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  outline: none;
+}
+
+.profile-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #fff;
+}
+.header-buttons{
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.dropdown {
+  position: absolute;
+  right: 1rem;
+  top: 48px;
+  background: #fff;
+  color: #333;
+  border-radius: 6px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  min-width: 120px;
+  z-index: 10;
+  padding: 0;
+}
+
+.dropdown-item {
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #f3f3f3;
+}
