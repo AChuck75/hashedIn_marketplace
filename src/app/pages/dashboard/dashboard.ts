@@ -1,6 +1,10 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
+import { HttpClient } from '@angular/common/http';
+import { SearchService } from '../../services/search.service';
+import { describe } from 'node:test';
+import { SortService } from '../../services/sort.service';
 
 type Product = { 
   name: string; 
@@ -21,33 +25,53 @@ type Product = {
 
 export class Dashboard {
   count=0;
-  products = [
-  {
-    name: 'Wireless Headphones',
-    price: 59.99,
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80',
-    count: 0
-  },
-  {
-    name: 'Smart Watch',
-    price: 129.99,
-    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80',
-    count: 0
-  },
-  {
-    name: 'Bluetooth Speaker',
-    price: 39.99,
-    image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80',
-    count: 0
-  },
-  {
-    name: 'VR Headset',
-    price: 199.99,
-    image: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80',
-    count: 0
+  products: Product[] = [];
+  filteredProducts: Product[] = [];
+  constructor(
+    private cartService: CartService,
+    private http:HttpClient,
+    private cdr: ChangeDetectorRef,
+    private searchService: SearchService,
+    private sortService: SortService,
+  ) {}
+  ngOnInit() {
+    this.http.get<Product[]>('https://fakestoreapi.com/products') // Example API
+      .subscribe((data: any) => {
+        this.products = data.map((item: any) => ({
+          name: item.title,
+          price: item.price,
+          image: item.image,
+          count: 0,
+          description: item.description || ''
+        }));
+        this.filteredProducts = [...this.products];
+        this.cdr.detectChanges(); 
+      });
+      this.searchService.searchQuery$.subscribe(query => {
+        if (query) {
+          this.filteredProducts = this.products.filter(product => 
+            product.name.toLowerCase().includes(query.toLowerCase())
+          );
+        } else {
+          this.filteredProducts = [...this.products];
+        }
+        
+      });
+      this.sortService.sortType$.subscribe(sortOption => {
+        this.sortProducts(sortOption);
+      });
   }
-];
-  constructor(private cartService: CartService) {}
+sortProducts(sortOption: string) {
+  if (sortOption === 'name') {
+    this.filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortOption === 'priceLow') {
+    this.filteredProducts.sort((a, b) => a.price - b.price);
+  } else if (sortOption === 'priceHigh') {
+    this.filteredProducts.sort((a, b) => b.price - a.price);
+  }
+ 
+}
+
   onAddToCart(product: Product) {
     product.count++;
     this.cartService.addToCart(product);

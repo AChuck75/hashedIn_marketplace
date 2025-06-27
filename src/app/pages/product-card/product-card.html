@@ -1,0 +1,7 @@
+<div class="product-card">
+  <img [src]="product.image" [alt]="product.name" style="width:100%; height:150px; object-fit:cover;" />
+  <input [(ngModel)]="product.name" placeholder="Product Name" class="product-input" />
+  <textarea [(ngModel)]="product.description" placeholder="Description" class="product-input"></textarea>
+  <input type="number" [(ngModel)]="product.price" placeholder="Price" class="product-input" />
+<button (click)="saveAllProducts()" class="save-btn" style="margin-top: 24px;">Save All</button>
+</div>

@@ -1,8 +1,8 @@
 <header class="company-header">
   <h4>HashedIn Marketplace</h4>
   <div class="search-bar">
-  <input type="text" class="input-search" placeholder="Search for items..." [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" />
-  <button (click)="onSearch()">🔍</button>
+  <input type="text" class="input-search" placeholder="Search for items..." [(ngModel)]="searchQuery" (ngModelChange)="onSearch()" />
+  
   <select [(ngModel)]="sortOption" (change)="onSortChange()">
     <option value="">Sort</option>
     <option value="name">Name (A-Z)</option>
@@ -17,7 +17,7 @@
     <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Profile" class="profile-icon" />
     <div class="dropdown" *ngIf="dropdownOpen">
       <div class="dropdown-item">My Profile</div>
-      <div class="dropdown-item">My Items</div>
+      <div class="dropdown-item" (click)="onMyItemsClick()" >My Items</div>
       <div class="dropdown-item" (click)="logout()">Logout</div>
     </div>
   </div>

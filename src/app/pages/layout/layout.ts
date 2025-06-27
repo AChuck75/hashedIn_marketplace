@@ -2,8 +2,10 @@ import { Component } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
-import { Subscription } from 'rxjs';
+import { debounce, Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { SearchService } from '../../services/search.service';
+import { SortService } from '../../services/sort.service';
 
 @Component({
   selector: 'app-layout',
@@ -21,7 +23,11 @@ export class Layout {
 
   private cartSub: Subscription;
   
-  constructor(private router: Router,private cartService: CartService) {
+  constructor(private router: Router,
+    private cartService: CartService,
+    private searchService: SearchService,
+    private sortService: SortService
+  ) {
     this.router.events.subscribe((e) => {
       if(e instanceof NavigationEnd) {
         this.updateLoginStatus();
@@ -68,10 +74,15 @@ export class Layout {
   onCartClick() {
     this.router.navigate(['/cart']);
   }
-  onSearch() {
-    
+  onMyItemsClick(){
+    this.router.navigate(['/my-items']);
+    this.closeDropdown();
   }
+  onSearch() {
+    this.searchService.setSearchQuery(this.searchQuery);
+  }
+
   onSortChange() {
-  
+    this.sortService.setsortType(this.sortOption);
   }
 }
