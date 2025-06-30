@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -14,7 +14,7 @@ export class LoginComponent {
   password = '';
   errorMessage = '';
 
-  constructor(private router:Router){}
+  private router:Router=inject(Router);
 
   onLogin() {
     if (!localStorage.getItem('username') || !localStorage.getItem('password')) {
@@ -31,5 +31,8 @@ export class LoginComponent {
       alert(this.errorMessage);
       this.username = ''; 
     }
+  }
+  onClickSignUp() {
+    this.router.navigate(['/signup']);
   }
 }
