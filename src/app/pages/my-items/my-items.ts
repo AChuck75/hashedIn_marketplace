@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ProductCardComponent } from "../product-card/product-card";
+import { FormsModule } from '@angular/forms';
 
-type Product = {
+interface Product {
   name: string;
   description?: string;
   price: number;
@@ -12,11 +13,19 @@ type Product = {
 
 @Component({
   selector: 'app-my-items',
-  imports: [CommonModule, ProductCardComponent],
+  imports: [CommonModule, ProductCardComponent,FormsModule],
   templateUrl: './my-items.html',
   styleUrl: './my-items.scss'
 })
 export class MyItems {
+  dialogOpen = false;
+  newProduct: Product = {
+    name: '',
+    description: '',
+    price: 0,
+    image: '',
+    count: 0
+  };
   products:Product[] = [
   {
     name: 'Wireless Headphones',
@@ -43,7 +52,31 @@ export class MyItems {
     count: 0
   }
 ];
-saveAllProducts(){
-  
-}
+
+addProduct() {
+  console.log('Adding product:', this.newProduct);
+    if (this.newProduct.name && this.newProduct.price && this.newProduct.image){
+      this.products.push({
+        ...this.newProduct,
+        count: 0
+      });
+      
+      this.closeDialog();
+     }
+  }
+
+  openDialog() {
+    this.dialogOpen = true;
+    this.newProduct = {
+      name: '',
+      description: '',
+      price: 0,
+      image: '',
+      count: 0
+    };
+  }
+
+  closeDialog() {
+    this.dialogOpen = false;
+  }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CartService, Product } from '../../services/cart.service';
 import { CommonModule } from '@angular/common';
 
@@ -11,7 +11,8 @@ import { CommonModule } from '@angular/common';
 })
 export class Cart {
 
-  constructor(private cartService: CartService) {}
+  
+  private cartService: CartService = inject(CartService);
   get cartItems(): Product[] {
     return this.cartService.getCart();
   }

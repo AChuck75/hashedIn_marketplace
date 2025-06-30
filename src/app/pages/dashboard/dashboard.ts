@@ -1,16 +1,16 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
 import { HttpClient } from '@angular/common/http';
 import { SearchService } from '../../services/search.service';
-import { describe } from 'node:test';
 import { SortService } from '../../services/sort.service';
 
-type Product = { 
+interface Product  { 
   name: string; 
   price: number; 
   image: string; 
-  count: number 
+  count: number;
+  description?: string;
 };
 
 
@@ -23,20 +23,19 @@ type Product = {
 })
 
 
-export class Dashboard {
+export class Dashboard implements OnInit {
   count=0;
   products: Product[] = [];
   filteredProducts: Product[] = [];
-  constructor(
-    private cartService: CartService,
-    private http:HttpClient,
-    private cdr: ChangeDetectorRef,
-    private searchService: SearchService,
-    private sortService: SortService,
-  ) {}
+  private cartService: CartService = inject(CartService);
+    private http:HttpClient= inject(HttpClient);
+    private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+    private searchService: SearchService= inject(SearchService);
+    private sortService: SortService= inject(SortService);
   ngOnInit() {
     this.http.get<Product[]>('https://fakestoreapi.com/products') // Example API
-      .subscribe((data: any) => {
+      .subscribe((data: Product[]) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.products = data.map((item: any) => ({
           name: item.title,
           price: item.price,

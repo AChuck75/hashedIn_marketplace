@@ -1,8 +1,9 @@
+/* eslint-disable @angular-eslint/prefer-inject */
 import { Component } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
-import { debounce, Subscription } from 'rxjs';
+import {  Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { SearchService } from '../../services/search.service';
 import { SortService } from '../../services/sort.service';
@@ -22,6 +23,7 @@ export class Layout {
   sortOption = '';
 
   private cartSub: Subscription;
+  
   
   constructor(private router: Router,
     private cartService: CartService,
@@ -76,6 +78,10 @@ export class Layout {
   }
   onMyItemsClick(){
     this.router.navigate(['/my-items']);
+    this.closeDropdown();
+  }
+  onMyProfileClick() {
+    this.router.navigate(['/profile']);
     this.closeDropdown();
   }
   onSearch() {
