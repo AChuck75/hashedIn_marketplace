@@ -20,7 +20,6 @@ export class ProductCardComponent {
   @Input()
   product!: Product;
   saveAllProducts() {
-    // Logic to save all products, e.g., send to a server or local storage
     console.log('Saving all products:', this.product);
   }
 }

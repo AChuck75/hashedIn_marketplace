@@ -36,11 +36,11 @@
           class="profile-icon"
         />
         <div class="dropdown" *ngIf="dropdownOpen">
-          <div class="dropdown-item" (click)="onMyProfileClick()" (keydown.enter)="onMyProfileClick()">My Profile</div>
-          <div class="dropdown-item" (click)="onMyItemsClick()" (keydown.enter)="onMyItemsClick()">
+          <div class="dropdown-item" tabindex="0" role="button" (click)="onMyProfileClick()" (keydown.enter)="onMyProfileClick()">My Profile</div>
+          <div class="dropdown-item" tabindex="1" role="button" (click)="onMyItemsClick()" (keydown.enter)="onMyItemsClick()">
             My Items
           </div>
-          <div class="dropdown-item" (click)="logout()">Logout</div>
+          <div class="dropdown-item" tabindex="2" role="button" (click)="logout()" (keydown.enter)="logout()">Logout</div>
         </div>
       </div>
     </div>

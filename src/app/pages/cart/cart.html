@@ -4,11 +4,21 @@
   <div *ngFor="let item of cartItems" class="cart-item">
     <img [src]="item.image" alt="cart-item" width="60" />
     <span>{{ item.name }}</span>
-    <span>Qty: {{ item.count }}</span>
+    <div>
+      <span>Qty:</span>
+      <input
+      type="number"
+      min="1"
+      [(ngModel)]="item.count"
+      (ngModelChange)="onQtyChange(item)"
+      class="qty-input"
+      style="width: 60px;"
+    />
+    </div>
     <span>${{ item.price * item.count }}</span>
   </div>
   <div *ngIf="cartItems.length > 0" class="cart-total">
     <strong>Total: ${{ totalPrice }}</strong>
   </div>
-    <button class="checkout-button" (click)="checkout()">Checkout</button>
+    <button *ngIf="cartItems.length>0" class="checkout-button" (click)="checkout()">Checkout</button>
 </div>

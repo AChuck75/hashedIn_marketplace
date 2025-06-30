@@ -1,9 +1,10 @@
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
 import { HttpClient } from '@angular/common/http';
 import { SearchService } from '../../services/search.service';
 import { SortService } from '../../services/sort.service';
+import { Subscription } from 'rxjs';
 
 interface Product  { 
   name: string; 
@@ -23,16 +24,22 @@ interface Product  {
 })
 
 
-export class Dashboard implements OnInit {
+export class Dashboard implements OnInit, OnDestroy {
   count=0;
   products: Product[] = [];
   filteredProducts: Product[] = [];
   private cartService: CartService = inject(CartService);
-    private http:HttpClient= inject(HttpClient);
-    private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
-    private searchService: SearchService= inject(SearchService);
-    private sortService: SortService= inject(SortService);
+  private http:HttpClient= inject(HttpClient);
+  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+  private searchService: SearchService= inject(SearchService);
+  private sortService: SortService= inject(SortService);
+  private cartsub!: Subscription;
+  
   ngOnInit() {
+    this.loadProducts();
+    this.cartsub= this.cartService.getCartObservable().subscribe((cart) => {
+      this.syncProducts(cart);
+    })
     this.http.get<Product[]>('https://fakestoreapi.com/products') // Example API
       .subscribe((data: Product[]) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,6 +51,8 @@ export class Dashboard implements OnInit {
           description: item.description || ''
         }));
         this.filteredProducts = [...this.products];
+        const cart=this.cartService.getCart();
+        this.syncProducts(cart);
         this.cdr.detectChanges(); 
       });
       this.searchService.searchQuery$.subscribe(query => {
@@ -59,7 +68,26 @@ export class Dashboard implements OnInit {
       this.sortService.sortType$.subscribe(sortOption => {
         this.sortProducts(sortOption);
       });
+      
   }
+
+  ngOnDestroy() {
+    if(this.cartsub) {
+      this.cartsub.unsubscribe();
+    }
+  }
+loadProducts() {
+  const cart = this.cartService.getCart();
+  this.syncProducts(cart);
+}
+
+syncProducts(cart: Product[]) {
+  this.filteredProducts.forEach(product => {
+    const cartItem = cart.find(item => item.name === product.name); 
+    product.count = cartItem ? cartItem.count : 0;
+  });
+}
+
 sortProducts(sortOption: string) {
   if (sortOption === 'name') {
     this.filteredProducts.sort((a, b) => a.name.localeCompare(b.name));

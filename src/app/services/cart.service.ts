@@ -36,4 +36,23 @@ export class CartService {
     }
     this.cartSubject.next(this.cart);
   }
+  updateCartItem(product: Product) {
+    const cart = this.getCart();
+  const index = cart.findIndex(item => item.name === product.name);
+  if (index !== -1) {
+    cart[index].count = product.count;
+    if (cart[index].count <= 0) {
+      cart.splice(index, 1);
+    }
+    
+    this.cartSubject.next(cart);
+  }
+  }
+  updateTotalPrice() {
+    return this.cart.reduce((total, item) => total + item.price * item.count, 0);
+  }
+  clearCart() {
+    this.cart = [];
+    this.cartSubject.next(this.cart);
+  }
 }
