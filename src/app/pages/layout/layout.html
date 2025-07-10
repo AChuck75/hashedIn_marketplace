@@ -18,6 +18,9 @@
       </select>
     </div>
     <div *ngIf="isLoggedIn" class="header-buttons">
+      <button (click)="goToNotifications()" class="notification-btn">
+  <img src="https://cdn-icons-png.flaticon.com/512/1827/1827392.png" alt="Notifications" style="width:20px;vertical-align:middle;margin-right:4px;" />
+</button>
       <button class="login-button" *ngIf="isLoggedIn" (click)="onCartClick()">
         🛒{{countItems}}
       </button>

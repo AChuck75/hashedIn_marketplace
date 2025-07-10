@@ -1,0 +1,33 @@
+
+<div class="notifications-page">
+  <h2>
+    <img src="https://cdn-icons-png.flaticon.com/512/1827/1827392.png" alt="Notifications" class="notification-header-icon" />
+    Notifications
+  </h2>
+  <div *ngIf="pendingRequests?.length; else noRequests">
+    <div *ngFor="let request of pendingRequests" class="notification-item">
+      <div class="notification-content">
+        <div class="notification-product">
+          <span class="product-name">{{ request.product.name }}</span>
+          <span class="notification-action">requested by</span>
+          <span class="buyer-name">{{ request.buyer.user_name }}</span>
+        </div>
+        <div class="notification-actions">
+          <button 
+          class="approve-btn" 
+          (click)="approveRequest(request.id)"
+          >Approve</button>
+          <button class="reject-btn" 
+          (click)="rejectRequest(request.id)">
+            Reject</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #noRequests>
+    <div class="notification-item no-requests">
+      <img src="https://cdn-icons-png.flaticon.com/512/1827/1827392.png" alt="No Notifications" class="no-requests-icon" />
+      <span>No pending requests.</span>
+    </div>
+  </ng-template>
+</div>

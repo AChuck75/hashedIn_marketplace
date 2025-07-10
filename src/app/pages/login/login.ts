@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -15,21 +16,20 @@ export class LoginComponent {
   errorMessage = '';
 
   private router:Router=inject(Router);
+  private authService: AuthService = inject(AuthService);
 
   onLogin() {
-    if (!localStorage.getItem('username') || !localStorage.getItem('password')) {
-        localStorage.setItem('username', 'admin');
-        localStorage.setItem('password', 'admin');
-      }
-    const storedUsername = 'admin';
-    const storedPassword = 'admin';
-    if (this.username === storedUsername && this.password === storedPassword) {
-      this.errorMessage = '';
-      this.router.navigate(['/dashboard']); 
-    } else {
-      this.errorMessage = 'Invalid username or password';
-      alert(this.errorMessage);
-      this.username = ''; 
+    if (this.username && this.password ) {
+      this.authService.login(this.username, this.password)
+        .subscribe({
+          next: () => {
+            this.router.navigate(['/dashboard']); 
+           
+          },
+          error: () => {
+            alert('Something went wrong. Please try again.');
+          }
+        });
     }
   }
   onClickSignUp() {

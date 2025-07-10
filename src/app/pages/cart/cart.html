@@ -6,16 +6,9 @@
     <span>{{ item.name }}</span>
     <div>
       <span>Qty:</span>
-      <input
-      type="number"
-      min="1"
-      [(ngModel)]="item.count"
-      (ngModelChange)="onQtyChange(item)"
-      class="qty-input"
-      style="width: 60px;"
-    />
+      
     </div>
-    <span>${{ item.price * item.count }}</span>
+    <span>${{ item.price }}</span>
   </div>
   <div *ngIf="cartItems.length > 0" class="cart-total">
     <strong>Total: ${{ totalPrice }}</strong>

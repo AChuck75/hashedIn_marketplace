@@ -1,12 +1,20 @@
 <div class="dashboard-container">
-  <h2>Products</h2>
-  
-    <div class="product-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;">
-      <button (click)="openDialog()" style="margin-bottom: 16px;">
-        <h2>Add Product</h2>
-      </button>
-      <app-product-card *ngFor="let product of products" [product]="product"></app-product-card>
+  <h2>My Products</h2>
+
+  <button (click)="openDialog()" style="margin-bottom: 16px;">
+    <h2>Add Product</h2>
+  </button>
+
+  <div class="product-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;">
+    <div *ngIf="products.length === 0" style="grid-column: 1 / -1; text-align: center; color: #888;">
+      No products found.
     </div>
+    <app-product-card 
+      *ngFor="let product of products" 
+      [product]="product"
+      (delete)="onProductDeleted($event)"
+      ></app-product-card>
+  </div>
 
   <div *ngIf="dialogOpen" class="dialog-backdrop">
     <div class="dialog-box">
@@ -16,7 +24,18 @@
         <textarea placeholder="Description" [(ngModel)]="newProduct.description" name="description" class="product-input"></textarea>
         <input type="number" placeholder="Price" [(ngModel)]="newProduct.price" name="price" required class="product-input" />
         <input type="text" placeholder="Image URL" [(ngModel)]="newProduct.image" name="image" required class="product-input" />
-        <input type="number" placeholder="Available units" [(ngModel)]="newProduct.count" name="available" required class="product-input" />
+        <select
+          [(ngModel)]="newProduct.category"
+          name="category"
+          required
+          class="product-input"
+        >
+          <option value="" disabled selected>Select category</option>
+          <option value="ELECTRONICS">Electronics</option>
+          <option value="BOOKS">Books</option>
+          <option value="FASHION">Fashion</option>
+          <option value="TOYS">Toys</option>
+        </select>
         <div style="margin-top: 16px;">
           <button type="submit" [disabled]="!productForm.form.valid">Add</button>
           <button type="button" (click)="closeDialog()">Cancel</button>
@@ -24,5 +43,4 @@
       </form>
     </div>
   </div>
-  
 </div>

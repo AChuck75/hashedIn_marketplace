@@ -1,5 +1,5 @@
 /* eslint-disable @angular-eslint/prefer-inject */
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart.service';
@@ -7,6 +7,7 @@ import {  Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { SearchService } from '../../services/search.service';
 import { SortService } from '../../services/sort.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -15,7 +16,7 @@ import { SortService } from '../../services/sort.service';
   templateUrl: './layout.html',
   styleUrl: './layout.scss'
 })
-export class Layout {
+export class Layout implements OnDestroy{
   isLoggedIn = false;
   dropdownOpen = false;
   countItems = 0;
@@ -23,21 +24,29 @@ export class Layout {
   sortOption = '';
 
   private cartSub: Subscription;
+  private authSub: Subscription;
   
   
   constructor(private router: Router,
     private cartService: CartService,
     private searchService: SearchService,
-    private sortService: SortService
+    private sortService: SortService,
+    private authService: AuthService,
   ) {
     this.router.events.subscribe((e) => {
       if(e instanceof NavigationEnd) {
-        this.updateLoginStatus();
+       
         this.updateCartCount()
       }
     });
     this.cartSub = this.cartService.getCartObservable().subscribe((cart) => {
-      this.countItems = cart.reduce((total, item) => total + item.count, 0);
+      this.countItems = cart.reduce((total, ) => total + 1, 0);
+    });
+
+    this.authSub = this.authService.isAuthenticated$.subscribe((isAuthenticated) => {
+      console.log('Auth status changed:', isAuthenticated);
+      this.isLoggedIn = isAuthenticated;
+      
     });
     
     
@@ -47,16 +56,15 @@ export class Layout {
     if (this.cartSub) {
       this.cartSub.unsubscribe();
     }
+    if (this.authSub) {
+      this.authSub.unsubscribe();
+    }
   }
 
   updateCartCount() {
-    this.countItems = this.cartService.getCart().reduce((total, item) => total + item.count, 0);
+    this.countItems = this.cartService.getCart().reduce((total, ) => total + 1, 0);
   }
-  updateLoginStatus() {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      this.isLoggedIn = !!localStorage.getItem('username') && !!localStorage.getItem('password');
-    }
-  }
+  
 
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
@@ -67,8 +75,7 @@ export class Layout {
   }
   logout() {
     this.isLoggedIn = false;
-    localStorage.removeItem('username');
-    localStorage.removeItem('password');
+
     this.router.navigate(['/login']);
     this.updateCartCount();
     this.closeDropdown();
@@ -90,5 +97,8 @@ export class Layout {
 
   onSortChange() {
     this.sortService.setsortType(this.sortOption);
+  }
+  goToNotifications() {
+    this.router.navigate(['/notifications']);
   }
 }

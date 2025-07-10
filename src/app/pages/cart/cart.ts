@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { CartService, Product } from '../../services/cart.service';
+import { CartService } from '../../services/cart.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Product } from '../../Interfaces/Dashboard';
 
 @Component({
   selector: 'app-cart',
@@ -19,12 +20,10 @@ export class Cart {
   }
   
   get totalPrice(): number {
-    return (this.cartItems.reduce((sum, item) => sum + item.price * item.count, 0));
+    return (this.cartItems.reduce((sum, item) => sum + (item.price as number) * 2, 0));
   }
   onQtyChange(item: Product) {
-    if (item.count < 1) {
-      item.count = 1;
-    }
+    
     this.cartService.updateCartItem(item); 
     
   }
@@ -33,7 +32,7 @@ export class Cart {
       alert('Your cart is empty!');
       return;
     }
-    const orderDetails = this.cartItems.map(item => `${item.name} (x${item.count}) - $${item.price.toFixed(2)}`).join('\n');
+    const orderDetails = this.cartItems.map(item => `${item.name} (x${item}) - $${(item.price as number).toFixed(2)}`).join('\n');
     const total = this.totalPrice.toFixed(2);
     alert(`Order placed successfully!\n\nOrder Details:\n${orderDetails}\n\nTotal: $${total}`);
     this.cartService.getCart().length = 0;

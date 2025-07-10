@@ -5,14 +5,10 @@ import { HttpClient } from '@angular/common/http';
 import { SearchService } from '../../services/search.service';
 import { SortService } from '../../services/sort.service';
 import { Subscription } from 'rxjs';
-
-interface Product  { 
-  name: string; 
-  price: number; 
-  image: string; 
-  count: number;
-  description?: string;
-};
+import { Product } from '../../Interfaces/Dashboard'; 
+import { ItemManagementService } from '../../services/item.management.service';
+import { TransactionManagementService } from '../../services/transaction.management.service';
+import { PendingRequest } from '../../Interfaces/Notifications';
 
 
 @Component({
@@ -27,6 +23,8 @@ interface Product  {
 export class Dashboard implements OnInit, OnDestroy {
   count=0;
   products: Product[] = [];
+  loggedInUserId: string | number = '';
+  pendingRequests:PendingRequest[]=[]
   filteredProducts: Product[] = [];
   private cartService: CartService = inject(CartService);
   private http:HttpClient= inject(HttpClient);
@@ -34,27 +32,40 @@ export class Dashboard implements OnInit, OnDestroy {
   private searchService: SearchService= inject(SearchService);
   private sortService: SortService= inject(SortService);
   private cartsub!: Subscription;
+  private itemManagementService:ItemManagementService= inject(ItemManagementService);
+  private transactionManagementService:TransactionManagementService=inject(TransactionManagementService);
   
   ngOnInit() {
-    this.loadProducts();
-    this.cartsub= this.cartService.getCartObservable().subscribe((cart) => {
-      this.syncProducts(cart);
+    
+    this.http.get<Product[]>('http://localhost:4000/api/products',{
+      withCredentials: true,
     })
-    this.http.get<Product[]>('https://fakestoreapi.com/products') // Example API
-      .subscribe((data: Product[]) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        this.products = data.map((item: any) => ({
-          name: item.title,
-          price: item.price,
-          image: item.image,
-          count: 0,
-          description: item.description || ''
-        }));
-        this.filteredProducts = [...this.products];
-        const cart=this.cartService.getCart();
-        this.syncProducts(cart);
-        this.cdr.detectChanges(); 
-      });
+    .subscribe((data: Product[]) => {
+      
+      this.products = data.map((item: Product) => ({
+        name: item.name,
+        price: item.price,
+        image: item.image,
+        description: item.description,
+        category: item.category,
+        id: item.id,
+        postedById: item.postedById,
+        postingDate: item.postingDate,
+        postedBy:item.postedBy
+      }));
+
+      this.filteredProducts = [...this.products];
+      
+      
+      this.cdr.detectChanges();
+    });
+    this.transactionManagementService.getPendingRequestsForSeller().subscribe({
+      next: (requests) => {
+        this.pendingRequests=requests
+      },
+      error: () => this.pendingRequests = []
+    });
+
       this.searchService.searchQuery$.subscribe(query => {
         if (query) {
           this.filteredProducts = this.products.filter(product => 
@@ -68,7 +79,10 @@ export class Dashboard implements OnInit, OnDestroy {
       this.sortService.sortType$.subscribe(sortOption => {
         this.sortProducts(sortOption);
       });
-      
+    const user = sessionStorage.getItem('user');
+    if (user) {
+      this.loggedInUserId = JSON.parse(user).id;
+    }
   }
 
   ngOnDestroy() {
@@ -76,37 +90,46 @@ export class Dashboard implements OnInit, OnDestroy {
       this.cartsub.unsubscribe();
     }
   }
-loadProducts() {
-  const cart = this.cartService.getCart();
-  this.syncProducts(cart);
-}
 
-syncProducts(cart: Product[]) {
-  this.filteredProducts.forEach(product => {
-    const cartItem = cart.find(item => item.name === product.name); 
-    product.count = cartItem ? cartItem.count : 0;
-  });
-}
+
+
 
 sortProducts(sortOption: string) {
   if (sortOption === 'name') {
     this.filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
   } else if (sortOption === 'priceLow') {
-    this.filteredProducts.sort((a, b) => a.price - b.price);
+    this.filteredProducts.sort((a, b) => Number(a.price) - Number(b.price));
   } else if (sortOption === 'priceHigh') {
-    this.filteredProducts.sort((a, b) => b.price - a.price);
+    this.filteredProducts.sort((a, b) => Number(b.price) - Number(a.price));
   }
  
 }
-
+  isPendingApproval(productId: string | number | undefined): boolean {
+    return this.pendingRequests.some(req => req.productId === productId);
+  }
   onAddToCart(product: Product) {
-    product.count++;
+    
     this.cartService.addToCart(product);
   }
   onRemoveFromCart(product: Product) {
-    if (product.count > 0) {
-      product.count--;
+    
       this.cartService.removeFromCart(product);
-    }
+    
   }
+  canBuyNow(product: Product): boolean {
+  const ownerId = product.postedBy?.id ?? product.postedById;
+  if (!ownerId) return false;
+  return String(ownerId) !== String(this.loggedInUserId);
+}
+  onBuyNow(product: Product) {
+  this.itemManagementService.buyProduct(product.id as string).subscribe({
+    next: (response) => {
+      console.log(response)
+      alert('Buy request sent to seller!');
+    },
+    error: (err) => {
+      alert(err.error?.error || 'Failed to send buy request.');
+    }
+  });
+}
 }

@@ -8,14 +8,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class Profile implements OnInit {
   username = '';
-  email = 'chakraborty75@gmail.com';
+  email = '';
 
 
   ngOnInit() {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      this.username = localStorage.getItem('username') || '';
-      
-      
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      console.log(JSON.parse(sessionStorage.getItem('user')!))
+      this.username = JSON.parse(sessionStorage.getItem('user')!).name;
+
+      // Example: Get username from session storage instead of local storage
+      this.email = JSON.parse(sessionStorage.getItem('user')!).email;
     }
   }
 
